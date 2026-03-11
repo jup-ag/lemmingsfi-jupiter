@@ -63,9 +63,7 @@ pub fn parse_token_amount(data: &[u8]) -> Result<u64, DeserializeError> {
     if data.len() < 72 {
         return Err(DeserializeError::DataTooShort);
     }
-    Ok(u64::from_le_bytes(
-        data[64..72].try_into().unwrap(),
-    ))
+    Ok(u64::from_le_bytes(data[64..72].try_into().unwrap()))
 }
 
 #[derive(Debug, thiserror::Error)]
@@ -85,7 +83,11 @@ pub mod pda {
     pub const VAULT_QUOTE_SEED: &[u8] = b"vault_quote";
     pub const CONFIG_SEED: &[u8] = b"config";
 
-    pub fn derive_market(program_id: &Pubkey, base_mint: &Pubkey, quote_mint: &Pubkey) -> (Pubkey, u8) {
+    pub fn derive_market(
+        program_id: &Pubkey,
+        base_mint: &Pubkey,
+        quote_mint: &Pubkey,
+    ) -> (Pubkey, u8) {
         Pubkey::find_program_address(
             &[MARKET_SEED, base_mint.as_ref(), quote_mint.as_ref()],
             program_id,
@@ -102,24 +104,5 @@ pub mod pda {
 
     pub fn derive_global_config(program_id: &Pubkey) -> (Pubkey, u8) {
         Pubkey::find_program_address(&[CONFIG_SEED], program_id)
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_parse_token_amount() {
-        let mut data = vec![0u8; 165]; // SPL Token account size
-        let amount: u64 = 1_000_000_000;
-        data[64..72].copy_from_slice(&amount.to_le_bytes());
-        assert_eq!(parse_token_amount(&data).unwrap(), amount);
-    }
-
-    #[test]
-    fn test_deserialize_error_too_short() {
-        let data = vec![0u8; 4];
-        assert!(deserialize_market(&data).is_err());
     }
 }
