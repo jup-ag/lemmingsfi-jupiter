@@ -27,6 +27,7 @@ pub struct MarketState {
     pub max_price_deviation_bps: u16,
     pub paused: bool,
     pub bump: u8,
+    pub oracle_authority: Pubkey,
 }
 
 /// On-chain GlobalConfig account state.
@@ -104,5 +105,24 @@ pub mod pda {
 
     pub fn derive_global_config(program_id: &Pubkey) -> (Pubkey, u8) {
         Pubkey::find_program_address(&[CONFIG_SEED], program_id)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_parse_token_amount() {
+        let mut data = vec![0u8; 165]; // SPL Token account size
+        let amount: u64 = 1_000_000_000;
+        data[64..72].copy_from_slice(&amount.to_le_bytes());
+        assert_eq!(parse_token_amount(&data).unwrap(), amount);
+    }
+
+    #[test]
+    fn test_deserialize_error_too_short() {
+        let data = vec![0u8; 4];
+        assert!(deserialize_market(&data).is_err());
     }
 }
