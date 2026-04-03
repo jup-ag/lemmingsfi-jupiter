@@ -118,6 +118,14 @@ quote_out = base_in × effective_bid / PRICE_SCALE
 
 Where `PRICE_SCALE = 1,000,000`. All intermediate math uses `u128`. Integer division truncates.
 
+**Oracle Age Spread Penalty**: On-chain, spreads widen linearly as the oracle ages:
+```
+age_penalty_bps = min(slots_since_oracle_update / 2, max_staleness_slots / 2)
+effective_bid = bid_spread_bps + age_penalty_bps  (capped at 10,000)
+effective_ask = ask_spread_bps + age_penalty_bps  (capped at 10,000)
+```
+The SDK provides `oracle_age_spread_penalty()` and `QuoteInput::from_market_with_age()` for accurate off-chain quoting.
+
 ## Error Codes
 
 | Code | Name | Description |
