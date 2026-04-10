@@ -6,5 +6,5 @@ edition = "2021"
 
 [dependencies]
 borsh = "1.5"
-solana-pubkey = { version = "2.3.0", features = ["borsh", "curve25519"] }
+solana-pubkey = { version = ">=3", features = ["borsh", "curve25519"] }
 thiserror = "2.0"
